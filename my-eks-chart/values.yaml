@@ -1,14 +1,14 @@
 # Default values for my-eks-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-applicationName: web-app
+applicationName: test-app
 replicaCount: 1
 
 image:
-  repository: 013335838002.dkr.ecr.us-east-2.amazonaws.com/web-app
+  repository: 013335838002.dkr.ecr.us-east-2.amazonaws.com/test-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.0.3
+  tag: v1.0.5
 
 imagePullSecrets: []
 nameOverride: ""
