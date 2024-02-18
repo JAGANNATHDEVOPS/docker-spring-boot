@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('CHECK THE NODES') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kubernetes-secret', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') 
+                {
+                    sh 'kubectl get nodes'
+                }
+            }
+        }
+        stage('DEPLOY ARGOCD') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kubernetes-secret', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') 
+                {
+                    sh """
+                    kubectl create namespace argocd
+                    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+                    """
+                }
+            }
+        }
+        stage('VERIFY RESOURCES IN ARGOCD NAMESPACE') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kubernetes-secret', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') 
+                {
+                    sh """
+                    kubectl get all -n argocd
+                    """
+                }
+            }
+        }
+        stage('EXPOSE ARGOCD service AS LOADBALANCER') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kubernetes-secret', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') 
+                {
+                    sh """
+                    kubectl patch svc argocd-server -n argocd -p '
+                    {
+                        "spec":
+                        {
+                            "type": "LoadBalancer"
+                        }
+                    }
+                    '"""
+                }
+            }
+        }
+    }
+}
