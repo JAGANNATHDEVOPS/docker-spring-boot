@@ -1,14 +1,14 @@
 # Default values for my-helm-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+applicationName: web-app
 replicaCount: 5
 
 image:
-  repository: 211223789150.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo
+  repository: 013335838002.dkr.ecr.us-east-2.amazonaws.com/web-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: v1.0.3
 
 imagePullSecrets: []
 nameOverride: ""
