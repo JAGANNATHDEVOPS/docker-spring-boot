@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage("CHECK BUILD No"){
+            steps{
+                script{
+                def buildNumber = env.BUILD_NUMBER
+                println "Build number is ${currentBuild.number}"
+                }
+            }
+        }
+        stage("CLONE THE REPO"){
+            steps{
+                checkout scmGit(branches: [[name: 'master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/JAGANNATHDEVOPS/docker-spring-boot.git']])
+            }
+        }
+        stage("Maven Build") {
+            steps {
+                script {
+                    sh "mvn package -DskipTests=true"
+                }
+            }
+        }
+        stage("BUILD DOCKER IMAGE"){
+            steps{
+                sh 'docker build -t 013335838002.dkr.ecr.us-east-2.amazonaws.com/test-app:v1.0.$BUILD_NUMBER .'
+                sh 'docker images'
+            }
+        }
+        stage("DOCKER LOGIN"){
+            steps{
+                sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 013335838002.dkr.ecr.us-east-2.amazonaws.com'
+            }
+        }
+        stage("PUSH IMAGE TO ECR"){
+            steps{
+                sh 'docker push 013335838002.dkr.ecr.us-east-2.amazonaws.com/test-app:v1.0.$BUILD_NUMBER'
+            }
+        }
+    }
+}
